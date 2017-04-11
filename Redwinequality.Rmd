@@ -549,7 +549,7 @@ Alcohol content, citric acid, sulphates and volatile acidity appear to have stro
 
 #Multivariate Plots
 
-In the plot of total sulfur dioxide vs. sulphates, we introduce a third attribute alcohol content. To do this analysis, a new variable called alcohol.factor is created that converts the continuous alcohol content variable to a categorical variable  For higher alcohol content, the same sulphate levels tends to correspond to higher total sulfur dioxide levels. The trend lines for three of the categories show an increasing trend, while that for wines with alcohol in range 9-10 show a decreasing trend.
+In the plot of total sulfur dioxide vs. sulphates, we introduce a third attribute alcohol content. To do this analysis, a new variable called alcohol.factor is created that converts the continuous alcohol content variable to a categorical variable.  For higher alcohol content, the same sulphate levels tends to correspond to higher total sulfur dioxide levels. The trend lines for three of the categories show an increasing trend, while that for wines with alcohol in range 9-10 show a decreasing trend.
 
 
 ```{r}
@@ -557,7 +557,7 @@ In the plot of total sulfur dioxide vs. sulphates, we introduce a third attribut
 wine$density.factor <- cut(wine$density, breaks = seq(0.99, 1.06, 0.003))
 wine$alcohol.factor <- cut(wine$alcohol, breaks = c(8,9,10,11,16))
 
-ggplot(data = wine, aes(x=sulphates, y=total.sulfur.dioxide, color = alcohol.factor))+
+ggplot(data = wine, aes(x = sulphates, y = total.sulfur.dioxide, color = alcohol.factor))+
   geom_point()+
   geom_smooth(method = "lm", size = 2)+
   scale_y_continuous(limits = c(0,200))+
@@ -573,7 +573,7 @@ Giving the large difference between the 75th percentile and maximum values for r
 
 
 ```{r}
-ggplot(data = subset(wine, residual.sugar < quantile(residual.sugar,0.95)), aes(x= residual.sugar, y=alcohol, color = density.factor))+
+ggplot(data = subset(wine, residual.sugar < quantile(residual.sugar,0.95)), aes(x = residual.sugar, y =alcohol, color = density.factor))+
   geom_point()+
   geom_smooth(method = "lm", size = 2)+
   scale_color_brewer(type = "seq", palette = 1, direction = 1)+
@@ -584,34 +584,22 @@ ggplot(data = subset(wine, residual.sugar < quantile(residual.sugar,0.95)), aes(
 
 ```{r}
 
-ggplot(data = subset(wine, residual.sugar < quantile(residual.sugar,0.95)), aes(x=residual.sugar, y=density, color = alcohol.factor))+
+ggplot(data = subset(wine, residual.sugar < quantile(residual.sugar,0.95)), aes(x = residual.sugar, y = density, color = alcohol.factor))+
   geom_point()+
   geom_smooth(method = "lm", size = 2)+
   scale_color_brewer(type = "seq", palette = 1)+
   theme_dark()
 
-
 ```
 
-We look at the relationship between sulphates and alcohol content for various qualities of wine. We see a slight negative trend 
-
-```{r}
-ggplot(data = wine, aes(x= alcohol, y= sulphates, color = as.factor(quality)))+
-  geom_point()+
-  geom_smooth(method = "auto", size = 1)+
-  scale_color_brewer(type = "seq", palette = 1, direction = 1)+
-  theme_dark()+
-  scale_y_continuous(limits = c(0.5,1.5))
-```
-
-Now we analyse the relationship between alcohol, sulphates, citric acid and volatile acidity (using variable qual.factor) for the different quality of wines. To do this, we create another variable, sulphates.to.alcohol, which is the ratio of sulphates to alcohol content. We see that the two variables - qual.factors and sulphates.to.alcohol shows a positive trend. The higher the quality of wine, the more top left aligned, the trend line. 
+Now we analyse the relationship between alcohol, sulphates, citric acid and volatile acidity (using variable qual.factor) for the different quality of wines. To do this, we create another variable, sulphates.to.alcohol, which is the ratio of sulphates to alcohol content. We see that the two variables - qual.factors and sulphates.to.alcohol shows a positive correlation. The higher the quality of wine, the more top left aligned, the trend line. 
 
 ```{r}
 
 # Creating a new variable sulphate.to.alcohol
 wine$sulphates.to.alcohol <- wine$sulphates/wine$alcohol
 
-ggplot(data = wine, aes(x= sulphates.to.alcohol, y= qual.factors, color = quality))+
+ggplot(data = wine, aes(x = sulphates.to.alcohol, y = qual.factors, color = quality))+
   geom_point()+
   geom_smooth(method = "lm", size = 1)+
   scale_color_brewer(type = "seq", palette = 1, direction = 1)+
@@ -637,7 +625,7 @@ Even through no relationship seems to exists between alcohol content and residua
 Citric acid is found in wines in small quantities and add freshness and flavor to wines. The largest bin in the histogram corresponds to wines with a value of 0 for citric acid. This makes one wonder why such a distribution is present and if citric acid cannot be added to certain types of red wines.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(data=wine, aes(x=citric.acid))+
+ggplot(data=wine, aes(x = citric.acid))+
   geom_histogram(binwidth = 0.01, fill = "darkblue")+
   xlab("Citric acid in wine g/dm^3")+
   ggtitle("Distribution of citric acid content in the wine samples")
@@ -661,17 +649,17 @@ ggplot(wine.quality, aes(qual.factors, ecdf, color = as.character(quality)))+
 
 ### Plot 3
 
-When we look at alcohol content and residual sugars as a whole, there does not seem to be a relationship. However when we include density also in the analysis, we can see a trend. The plot indicates that for various density ranges, increase in alcohol content,is often accompanied by an increase the residual sugar levels.
+When we incorporate the four key attributes impacting wine quality, we see a positive relationship between the corresponding derived variables. The higher the wine rating, the higher the trend line and lesser spread (low range of x values). This is in line with our intution. The higher citric acid and lower volatile acid content should help improve wine quality. Also higher alcohol content and lower Sulphate values should reduce the spread. As we saw earlier higher quality wines tend to have larger alcohol content thus reducing the ratio. 
 
 ```{r}
-ggplot(data = wine, aes(x= sulphates.to.alcohol, y= qual.factors, color = quality))+
+ggplot(data = wine, aes(xv= sulphates.to.alcohol, yv= qual.factors, color = quality))+
   geom_point()+
   geom_smooth(method = "lm", size = 1)+
   scale_color_brewer(type = "seq", palette = 1, direction = 1)+
   theme_dark()+
   xlab("Sulphates to Alcohol")+
-  ylab("Ciric acid to Volatile acidity")+
-  ggtitle("Impact of four key attributes on wine quality ")+
+  ylab("Citric acid to Volatile acidity")+
+  ggtitle("Impact of four key attributes on wine quality")+
   labs(color = "Wine Quality")
   
 ```
