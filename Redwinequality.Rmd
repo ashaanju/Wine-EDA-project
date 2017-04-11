@@ -31,7 +31,8 @@ str(wine)
 
 wine <- subset(wine, select = -c(X)) # Removing first column which is just the row number
 
-wine_cor <- cor(wine) # creating an additional dataframe wine_cor to use with corrplot
+wine_cor <- cor(wine, method = "spearman") # creating an additional dataframe wine_cor to use with corrplot
+
 wine$quality <- as.factor(wine$quality) # Changing quality variable to factor 
 
 
@@ -258,6 +259,9 @@ corrplot(wine_cor, method = "number", type = "lower")
 ```
 
 Fixed acidity appears to have a positive correlation with citric acid and density values and negative correlation with pH values. Citric acid has a negative correlation with volatile acidity and pH vlues and a positive correlation with density values.  Quality appears to have a positive correlation to alcohol content, sulphates and citrix acid and a negative correlation with volatile acidity. 
+```{r}
+
+```
 
 We will now investigate the distribution of attribute values for each quality level of wine starting with alcohol content.
 
@@ -286,7 +290,7 @@ wine%>%
 
 ```
 
-The median fixed acidity levels tend to increase with quality levels, except for a fall at level 8. However given the slow pace of increase from levels 3 to 6 and the sudden spike at level 7, it is not evident whether the values for level 7 are unusually high or not. The correlation coefficient is 0.12.
+The median fixed acidity levels tend to increase with quality levels, except for a fall at level 8. However given the slow pace of increase from levels 3 to 6 and the sudden spike at level 7, it is not evident whether the values for level 7 are unusually high or not. The correlation coefficient is 0.11.
 
 ```{r fig.height = 8}
 x1 <- ggplot(data = wine, aes(x = quality, y = fixed.acidity))+
@@ -307,7 +311,7 @@ wine%>%
             median_fixed.acidity = median(fixed.acidity))
 ```
 
-The median volatile acidity values falls with the increase in wine quality.Therefore the volatile acidity levels can be used as a factor to predict wine quality. The correlation coefficient is -0.39.
+The median volatile acidity values falls with the increase in wine quality.Therefore the volatile acidity levels can be used as a factor to predict wine quality. The correlation coefficient is -0.38 .
 
 ```{r}
 ggplot(data = wine, aes(x = quality, y = volatile.acidity)) +
@@ -319,7 +323,7 @@ wine%>%
             median_volatile.acidity = median(volatile.acidity))
 ```
 
-The median and mean values for citric acid increases with increase in wine quality. Therefore the citric acid value can be a feature of interest in predicting wine quality. The correlation with wine quality is 0.23.
+The median and mean values for citric acid increases with increase in wine quality. Therefore the citric acid value can be a feature of interest in predicting wine quality. The correlation with wine quality is 0.21.
 
 ```{r}
 ggplot(data = wine, aes(x = quality, y=citric.acid)) +
@@ -351,7 +355,7 @@ wine%>%
             median_residual.sugar = median(residual.sugar))
 ```
 
-The change in median chloride values are very small and shows a general decreasing trend (except for quality level 4). The correlation coefficient is -0.13.
+The change in median chloride values are very small and shows a general decreasing trend (except for quality level 4). The correlation coefficient is -0.19.
 
 ```{r}
 x1 <- ggplot(data = wine, aes(x = quality, y = chlorides)) +
@@ -371,7 +375,7 @@ wine%>%
             median_chlorides = median(chlorides))
 ```
 
-Both free sulfur dioxide and total sulfur dioxide shows an initial increase with quality and then a decrease with quality. The switch happens at quality level 5, same level at which we see the abberation in trend in alcohol levels. So this raises the question if the S02 levels are impacted by the alcohol content in the wine samples. The correlation of free sulfur dioxide with quality is close to zero. The correlation between total sulfur dioxide and quality is -0.19.
+Both free sulfur dioxide and total sulfur dioxide shows an initial increase with quality and then a decrease with quality. The switch happens at quality level 5, same level at which we see the abberation in trend in alcohol levels. So this raises the question if the S02 levels are impacted by the alcohol content in the wine samples. The correlation of free sulfur dioxide with quality is close to zero. The correlation between total sulfur dioxide and quality is -0.2 .
 
 ```{r}
 x1 <- ggplot(data = wine, aes(x = quality, y = free.sulfur.dioxide)) +
@@ -409,7 +413,7 @@ wine%>%
             median_total.sulfur.dioxide = median(total.sulfur.dioxide))
 ```
 
-However the plot of total sulfur dioxide vs. alcohol content does not seem to suggest much of a relationship. The correlation coefficient is -0.21.
+However the plot of total sulfur dioxide vs. alcohol content does not seem to suggest much of a relationship. The correlation coefficient is -0.26.
 
 ```{r}
 ggplot(data = wine, aes(x = alcohol, y = total.sulfur.dioxide)) +
@@ -427,7 +431,7 @@ ggplot(data = wine, aes(x = quality, y = density)) +
   geom_boxplot(color = "darkblue")
 ```
 
-The pH and density values do show a general decreasing trend. However in both cases, for there is an increase in median and mean values at one of the given quality level. The correlation coefficients are -0.06 and -0.17 respectively.
+The pH and density values do show a general decreasing trend. However in both cases, for there is an increase in median and mean values at one of the given quality level. The correlation coefficients are -0.04 and -0.18 respectively.
 
 ```{r}
 wine %>%
@@ -438,7 +442,7 @@ wine %>%
             median.ph = median(pH))
 ```
 
-The sulphates value show a general increase in mean and median values with quality levels. Therfore the sulphate level could be a factor influencing wine quality. The correlation between sulphate level and wine quality is 0.25.
+The sulphates value show a general increase in mean and median values with quality levels. Therfore the sulphate level could be a factor influencing wine quality. The correlation between sulphate level and wine quality is 0.38.
 
 ```{r}
 x1 <- ggplot(data = wine, aes(x = quality, y = sulphates)) +
@@ -474,21 +478,21 @@ ggplot(data = wine, aes(x = fixed.acidity, y= density)) +
   geom_point(color = "darkblue")
 ```
 
-The plots show a positive correlation for fixed acidity with density (correlation of 0.67) and citric acid (0.67) values.
+The plots show a positive correlation for fixed acidity with density (correlation of 0.62) and citric acid (0.66) values.
 
 ```{r}
 ggplot(data = wine, aes(x = volatile.acidity, y =  citric.acid)) +
   geom_point(color = "darkblue")
 ```
 
-Volatile acidity has a negative relatitonship with citric acid values (-0.55).
+Volatile acidity has a negative relatitonship with citric acid values (-0.61).
 
 ```{r}
 ggplot(data = wine, aes(x = sulphates, y = total.sulfur.dioxide)) +
   geom_point(color = "darkblue")
 ```
 
-Unlike what I expected, no relationship seem to exist between sulphates and S02 values (0.04). 
+Unlike what I expected, no relationship seem to exist between sulphates and S02 values. 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width = 12}
 
@@ -561,8 +565,6 @@ ggplot(data = wine, aes(x=sulphates, y=total.sulfur.dioxide, color = alcohol.fac
   scale_color_brewer(type = "seq", palette = 1, direction = 1)+
   theme_dark()
 
-ggplot(data = wine, aes(x=alcohol.factor, y = quality))+
-  geom_jitter(alpha = 0.5)
 ```
 
 We analyse the relationship between residual sugars, alcohol and density. A new variable - density.factor is introduced that categorizes density variable into equal size bins. 
@@ -591,12 +593,27 @@ ggplot(data = subset(wine, residual.sugar < quantile(residual.sugar,0.95)), aes(
 
 ```
 
-Now we analyse the relationship between sulphates, citric acid and volatile acidity (using variable qual.factor) for the different quality of wines. The relationship between sulphates and qual.factor variable is positive within each quality level (except for wines with rating 8).
+We look at the relationship between sulphates and alcohol content for various qualities of wine. We see a slight negative trend 
 
 ```{r}
-ggplot(data = wine, aes(x= sulphates, y=qual.factors, color = quality))+
+ggplot(data = wine, aes(x= alcohol, y= sulphates, color = as.factor(quality)))+
   geom_point()+
-  geom_smooth(method = "lm", size = 2)+
+  geom_smooth(method = "auto", size = 1)+
+  scale_color_brewer(type = "seq", palette = 1, direction = 1)+
+  theme_dark()+
+  scale_y_continuous(limits = c(0.5,1.5))
+```
+
+Now we analyse the relationship between alcohol, sulphates, citric acid and volatile acidity (using variable qual.factor) for the different quality of wines. To do this, we create another variable, sulphates.to.alcohol, which is the ratio of sulphates to alcohol content. We see that the two variables - qual.factors and sulphates.to.alcohol shows a positive trend. The higher the quality of wine, the more top left aligned, the trend line. 
+
+```{r}
+
+# Creating a new variable sulphate.to.alcohol
+wine$sulphates.to.alcohol <- wine$sulphates/wine$alcohol
+
+ggplot(data = wine, aes(x= sulphates.to.alcohol, y= qual.factors, color = quality))+
+  geom_point()+
+  geom_smooth(method = "lm", size = 1)+
   scale_color_brewer(type = "seq", palette = 1, direction = 1)+
   theme_dark()
   
@@ -606,11 +623,11 @@ ggplot(data = wine, aes(x= sulphates, y=qual.factors, color = quality))+
 # Multivariate Analysis
 
 ### Did you create any new varable in the analysis?
-Two new variables alcohol.factor and density.factor were created to convert the continuous variables alcohol and density to respective categorical variables.
+Two new variables alcohol.factor and density.factor were created to convert the continuous variables alcohol and density to respective categorical variables. A new continuous variable - sulphates.to.alcohol was defined as the ratio of the two variables sulphates and alcohol.
 
 ### What were some of the relationships observed during the investigation
 
-Even through no relationship seems to exists between alcohol content and residual sugars for the dataset as a whole, when we incorporate density levels into the analysis, we see a positive relationship. A weak positive relationship appear to exist between total sulfur dioxide and sulphates when we include alcohol content of wines in the analysis. Except for wines with quality rating 8, a positive relationship existis between sulphate levels and qual.factor variable (ratio of citric acid to volatile acidity).
+Even through no relationship seems to exists between alcohol content and residual sugars for the dataset as a whole, when we incorporate density levels into the analysis, we see a positive relationship. A weak positive relationship appear to exist between total sulfur dioxide and sulphates when we include alcohol content of wines in the analysis. A positive relationship exists between sulphate.to.alcohol variable and qual.factor variable (ratio of citric acid to volatile acidity).The higher the quality of wine, the higher and left oriented the corresponding data points (higher citric acid and SO2 values and lower volatile acidity and alcohol values).
 
 
 
@@ -647,16 +664,15 @@ ggplot(wine.quality, aes(qual.factors, ecdf, color = as.character(quality)))+
 When we look at alcohol content and residual sugars as a whole, there does not seem to be a relationship. However when we include density also in the analysis, we can see a trend. The plot indicates that for various density ranges, increase in alcohol content,is often accompanied by an increase the residual sugar levels.
 
 ```{r}
-ggplot(data = subset(wine, residual.sugar < quantile(residual.sugar,0.95)), aes(x= alcohol, y=residual.sugar, color = density.factor))+
+ggplot(data = wine, aes(x= sulphates.to.alcohol, y= qual.factors, color = quality))+
   geom_point()+
-  geom_smooth(method = "lm", size = 2)+
+  geom_smooth(method = "lm", size = 1)+
   scale_color_brewer(type = "seq", palette = 1, direction = 1)+
   theme_dark()+
-  xlab("Percentage of Alcohol")+
-  ylab("Residual Sugar in grams/liter")+
-  ggtitle("Residual Sugar vs. Alcohol ")+
-  labs(color = "Density category")+
-  scale_x_continuous(limits = c(8,14))
+  xlab("Sulphates to Alcohol")+
+  ylab("Ciric acid to Volatile acidity")+
+  ggtitle("Impact of four key attributes on wine quality ")+
+  labs(color = "Wine Quality")
   
 ```
 
