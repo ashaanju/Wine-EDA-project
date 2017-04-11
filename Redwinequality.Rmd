@@ -9,7 +9,10 @@ This data set contains 1599 observations across 13 variables. The first variable
 
 The variable quality is converted to ordered factor format to make the analysis simpler. 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r global_options, include=FALSE}
+
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
+
 # Loading relevant libraries
 library(ggplot2)
 library(reshape2)
@@ -20,8 +23,9 @@ library(RColorBrewer)
 library(corrplot)
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r}
 #Reading the file with our data and analysing the structure of data
+
 wine <- read.csv("wineQualityReds.csv")
 str(wine)
 
@@ -38,7 +42,10 @@ summary(wine) # Getting summary statistics of all data points
 
 #Univariate Plots Section
 We first look at the quality rating of wines in our dataset.
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+Most of the data in our dataset corresponds to wines with a quality rating of 5 or 6. They is very little data about really good or bad wines.
+
+```{r}
 
 ggplot(data = wine, aes(x = quality)) +
   geom_bar(color = "darkolivegreen", fill = "darkblue") +
@@ -47,11 +54,11 @@ ggplot(data = wine, aes(x = quality)) +
 summary(wine$quality)  
 ```
 
-Most of the data in our dataset corresponds to wines with a quality rating of 5 or 6. They is very little data about really good or bad wines.
-
 We will now look at distribution of fixed and volatile acidity in the wine dataset.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=5}
+Fixed acidity is positively skewed with a peak around 7.
+
+```{r fig.width=12, fig.height=5}
 
 ggplot(data = wine, aes(x = fixed.acidity)) +
   geom_histogram(binwidth = 0.25, color = "darkolivegreen", fill = "darkblue") +
@@ -60,29 +67,28 @@ ggplot(data = wine, aes(x = fixed.acidity)) +
 summary(wine$fixed.acidity)
 ```
 
-Fixed acidity is positively skewed with a peak around 7.
+When we plot the distribution of the volatile acidity values, we get a range of values, where the count is consistenly large and outside which the count tapers off. The IQR of 0.25 is approximately 16% of the maximum value.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width= 12, fig.height=5}
+```{r fig.width= 12, fig.height=5}
 
-ggplot(data = wine, aes(x = volatile.acidity)) +
+x1 <- ggplot(data = wine, aes(x = volatile.acidity)) +
   geom_histogram(binwidth = 0.04, color = "darkolivegreen", fill = "darkblue") +
   theme(axis.title = element_text(size = 16), axis.text = element_text(size = 14))
+
+x2 <- ggplot(data = wine, aes(x = volatile.acidity)) +
+  geom_histogram(binwidth = 0.04, color = "darkolivegreen", fill = "darkblue") +
+  theme(axis.title = element_text(size = 16), axis.text = element_text(size = 14)) +
+  scale_x_continuous(limits = (0:1))
+
+grid.arrange(x1, x2, ncol = 2)
 
 summary(wine$volatile.acidity)
 
 ```
 
-When we plot the distribution of the volatile acidity values, we get a range of values, where the count is consistenly large and outside which the count tapers off. The IQR of 0.25 is approximately 16% of the maximum value. 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width= 12, fig.height=5}
+The distribution of citric acid values has two peaks that stand out. The maximum number of entries correspond to a value of 0. Another prominent peak is around value 0.49. Since citric acid imparts freshness and flavor to wine, I feel that the higher citric acid values would correspond to wines of higher quality. The high count of "0" citric acid value for wines (more than the number of lower quality wines in the sample) makes one wonder if there are certain varieties of wines where citric acid is not used. 
 
-ggplot(data = wine, aes(x = volatile.acidity)) +
-  geom_histogram(binwidth = 0.04, color = "darkolivegreen", fill = "darkblue") +
-  theme(axis.title = element_text(size = 16), axis.text = element_text(size = 14)) +
-  scale_x_continuous(limits = (0:1))
-```
-
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=5}
+```{r fig.width=12, fig.height=5}
 ggplot(data = wine, aes(x=citric.acid)) +
   geom_histogram(binwidth = 0.01, fill = "darkblue") +
   theme(axis.title = element_text(size = 16), axis.text = element_text(size = 14))
@@ -90,133 +96,127 @@ ggplot(data = wine, aes(x=citric.acid)) +
 summary(wine$citric.acid)
 ```
 
-The distribution of citric acid values has two peaks that stand out. The maximum number of entries correspond to a value of 0. Another prominent peak is around value 0.49. Since citric acid imparts freshness and flavor to wine, I feel that the higher citric acid values would correspond to wines of higher quality. The high count of "0" citric acid value for wines (more than the number of lower quality wines in the sample) makes one wonder if there are certain varieties of wines where citric acid is not used. 
+Residual sugar values are distributed tightly around a peak value of 2 and have a long tail.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=5}
-ggplot(data = wine, aes(x = residual.sugar)) +
+```{r fig.width = 12, fig.height = 5}
+x1 <- ggplot(data = wine, aes(x = residual.sugar)) +
   geom_histogram(binwidth = 0.2, color = "darkolivegreen", fill = "darkblue") +
   theme(axis.title = element_text(size = 16), axis.text = element_text(size = 14))
 
-summary(wine$residual.sugar)
-```
-
-Residual sugar values are distributed tightly around a peak value of 2 and have a long tail.
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=5}
-ggplot(data=wine, aes(x=residual.sugar))+
+x2 <- ggplot(data=wine, aes(x=residual.sugar))+
   geom_histogram(binwidth = 0.2, color = "darkolivegreen", fill = "darkblue")+
   theme(axis.title = element_text(size = 16), axis.text = element_text(size = 14))+
   scale_x_continuous(limits = c(0,4))
 
-```
+grid.arrange(x1, x2, ncol = 2)
 
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=5}
-ggplot(data = wine, aes(x = chlorides)) +
-  geom_histogram(binwidth = 0.01, color = "darkolivegreen", fill = "darkblue") +
-  theme(axis.title = element_text(size = 16), axis.text = element_text(size = 14))
-
-summary(wine$chlorides)  
+summary(wine$residual.sugar)
 ```
 
 Chlorides also exhibit a distribution similar to residual sugars. 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=5}
-ggplot(data = wine, aes(x = chlorides)) +
+```{r fig.width=12, fig.height=5}
+x1 <- ggplot(data = wine, aes(x = chlorides)) +
+  geom_histogram(binwidth = 0.01, color = "darkolivegreen", fill = "darkblue") +
+  theme(axis.title = element_text(size = 16), axis.text = element_text(size = 14))
+
+x2 <- ggplot(data = wine, aes(x = chlorides)) +
   geom_histogram(binwidth = 0.01, color = "darkolivegreen", fill = "darkblue") +
   theme(axis.title = element_text(size = 16), axis.text = element_text(size = 14)) +
   scale_x_continuous(limits = c(0,0.15))
 
-```
+grid.arrange(x1, x2, ncol = 2)
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=5}
-ggplot(data = wine, aes(x = free.sulfur.dioxide)) +
-  geom_histogram(binwidth = 1, color = "darkolivegreen", fill = "darkblue") +
-  theme(axis.title = element_text(size = 16), axis.text = element_text(size = 14))
-
-summary(wine$free.sulfur.dioxide)
-```
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=5}
-ggplot(data=wine, aes(x=total.sulfur.dioxide))+
-  geom_histogram(binwidth = 3, color = "darkolivegreen", fill = "darkblue")+
-  scale_x_continuous(limits = c(0,180))+
-  theme(axis.title = element_text(size = 16), axis.text = element_text(size = 14))
-
-summary(wine$total.sulfur.dioxide)
+summary(wine$chlorides)  
 ```
 
 Free and total sulfur dioxide distributions are positively skewed with a long tail. Given the distribution of values over a large range, I am interested in exploring their impact on wine quality.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=5}
-ggplot(data = wine, aes(x = free.sulfur.dioxide)) +
+Reploting the graphs with x scaled by square root, we see a more uniform distribution.
+
+```{r fig.width=12, fig.height=5}
+x1 <- ggplot(data = wine, aes(x = free.sulfur.dioxide)) +
+  geom_histogram(binwidth = 1, color = "darkolivegreen", fill = "darkblue") +
+  theme(axis.title = element_text(size = 16), axis.text = element_text(size = 14))
+
+x2 <- ggplot(data = wine, aes(x = free.sulfur.dioxide)) +
   geom_histogram(binwidth = 0.5, color = "darkolivegreen", fill = "darkblue") +
   theme(axis.title = element_text(size = 16), axis.text = element_text(size = 14)) +
   scale_x_sqrt()
 
+grid.arrange(x1, x2, ncol = 2)
+
+summary(wine$free.sulfur.dioxide)
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=5}
-ggplot(data=wine, aes(x = total.sulfur.dioxide)) +
+```{r fig.width=12, fig.height=5}
+x1 <- ggplot(data=wine, aes(x=total.sulfur.dioxide))+
+  geom_histogram(binwidth = 3, color = "darkolivegreen", fill = "darkblue")+
+  scale_x_continuous(limits = c(0,180))+
+  theme(axis.title = element_text(size = 16), axis.text = element_text(size = 14))
+
+x2 <- ggplot(data=wine, aes(x = total.sulfur.dioxide)) +
   geom_histogram(binwidth = 1, color = "darkolivegreen", fill = "darkblue") +
   scale_x_continuous(limits = c(0,180)) +
   theme(axis.title = element_text(size = 16), axis.text = element_text(size = 14)) +
   scale_x_sqrt()
+
+grid.arrange(x1, x2, ncol = 2)
+
+summary(wine$total.sulfur.dioxide)
 ```
 
-Reploting the graphs with x scaled by square root, we see a more uniform distribution.
+pH and Density have distributions with similar shape. It will be interesting to see if there is a causal relationship between the two attributes or if this similarity in distribution is caused by a third attribute. I also feel that based on the shape of the distributions, these two attributes could be influencing wine quality.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=5}
+```{r fig.width=12, fig.height=5}
 ggplot(data = wine, aes(x = density)) +
   geom_histogram(binwidth = 0.00025, color = "darkolivegreen", fill = "darkblue") +
   theme(axis.title = element_text(size = 16), axis.text = element_text(size = 14))
 
 summary(wine$density)
 ```
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=5}
+```{r fig.width=12, fig.height=5}
 ggplot(data=wine, aes(x=pH))+
   geom_histogram(binwidth = 0.02, color = "darkolivegreen", fill = "darkblue")+
   theme(axis.title = element_text(size = 16), axis.text = element_text(size = 14))
 summary(wine$pH)
 ```
 
-pH and Density have distributions with similar shape. It will be interesting to see if there is a causal relationship between the two attributes or if this similarity in distribution is caused by a third attribute. I also feel that based on the shape of the distributions, these two attributes could be influencing wine quality.
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=5}
-ggplot(data = wine, aes(x = sulphates))+
+```{r fig.width=12, fig.height=5}
+x1 <- ggplot(data = wine, aes(x = sulphates))+
   geom_histogram(binwidth = 0.025, color = "darkolivegreen", fill = "darkblue")+
   theme(axis.title = element_text(size = 16), axis.text = element_text(size = 14))
+
+x2 <- ggplot(data=wine, aes(x=sulphates))+
+  geom_histogram(binwidth = 0.025, color = "darkolivegreen", fill = "darkblue")+
+  theme(axis.title = element_text(size = 16), axis.text = element_text(size = 14))+
+  scale_x_continuous(limits = c(0.3,1.3))
+
+grid.arrange(x1, x2, ncol = 2)
 
 summary(wine$sulphates)
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=5}
-ggplot(data=wine, aes(x=sulphates))+
-  geom_histogram(binwidth = 0.025, color = "darkolivegreen", fill = "darkblue")+
-  theme(axis.title = element_text(size = 16), axis.text = element_text(size = 14))+
-  scale_x_continuous(limits = c(0.3,1.3))
-```
+The distribution of alcohol content of wines are again positively skewed with a long tail. This spread of values makes it a possible attribute of interest in our analysis of factors that determine quality. 
 
+The distribution of alcohol values are replotted with a square root scaled x.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=5}
-ggplot(data=wine, aes(x=alcohol)) +
+```{r fig.width=12, fig.height=5}
+x1 <- ggplot(data=wine, aes(x=alcohol)) +
   geom_histogram(binwidth = 0.1, color = "darkolivegreen", fill = "darkblue") +
   theme(axis.title = element_text(size = 16), axis.text = element_text(size = 14))
+
+x2 <- ggplot(data = wine, aes(x = alcohol)) +
+  geom_histogram(binwidth = 0.1, color = "darkolivegreen", fill = "darkblue") +
+  theme(axis.title = element_text(size = 16), axis.text = element_text(size = 14)) +
+  scale_x_sqrt()
+
+grid.arrange(x1, x2, ncol = 2)
 
 summary(wine$alcohol)
 
 ```
 
-The distribution of alcohol content of wines are again positively skewed with a long tail. This spread of values makes it a possible attribute of interest in our analysis of factors that determine quality. 
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=12, fig.height=5}
-ggplot(data = wine, aes(x = alcohol)) +
-  geom_histogram(binwidth = 0.1, color = "darkolivegreen", fill = "darkblue") +
-  theme(axis.title = element_text(size = 16), axis.text = element_text(size = 14)) +
-  scale_x_sqrt()
-
-```
-The distribution of alcohol values are replotted with a square root scaled x.
 
 # Univariate Analysis
 
@@ -245,13 +245,13 @@ No new variables were created in this analysis. However the quality values have 
 #Bivariate Plots
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, , fig.width=7, fig.height=7}
+```{r fig.height = 7}
 
 corrplot(wine_cor, method = "ellipse", type = "lower")
 
 
 ```
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=7, fig.height=7}
+```{r fig.height = 7}
 
 corrplot(wine_cor, method = "number", type = "lower")
 
@@ -259,25 +259,25 @@ corrplot(wine_cor, method = "number", type = "lower")
 
 Fixed acidity appears to have a positive correlation with citric acid and density values and negative correlation with pH values. Citric acid has a negative correlation with volatile acidity and pH vlues and a positive correlation with density values.  Quality appears to have a positive correlation to alcohol content, sulphates and citrix acid and a negative correlation with volatile acidity. 
 
-
-
-
 We will now investigate the distribution of attribute values for each quality level of wine starting with alcohol content
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(data = wine, aes(x = quality, y = alcohol)) +
-  geom_boxplot(color = "darkblue")
-```
 
 The median alcohol content in the wine samples falls between quality ratings 4 and 5 and the increases again. We also see a lot of outliers at the higher end in the case of wine with quality 5. To understand the distribution further we generate a violin plot.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(data = wine, aes(x = quality, y = alcohol, color = as.character(quality)))+
+The plot shows that for wine with quality 5, compared to other quality levels, the distribution has unusually large number of  wines with low percentage of alcohol. For all other quality levels in the dataset the samples are more spread out with mean alcohol content increasing. Therefore the dip we see could be due to the dataset chosen for analysis. The correlation coefficient between alcohol content and quality is 0.48.
+
+
+```{r fig.height = 8}
+x1 <- ggplot(data = wine, aes(x = quality, y = alcohol))+
+  geom_boxplot(color = "darkblue")
+
+x2 <- ggplot(data = wine, aes(x = quality, y = alcohol, color = as.character(quality)))+
   geom_violin(color = "darkblue")
 
+grid.arrange(x1, x2, ncol = 1)
 ```
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r}
 
 wine%>%
   group_by(quality)%>%
@@ -286,156 +286,150 @@ wine%>%
 
 ```
 
-The plot shows that for wine with quality 5, compared to other quality levels, the distribution has unusually large number of  wines with low percentage of alcohol. For all other quality levels in the dataset the samples are more spread out with mean alcohol content increasing. Therefore the dip we see could be due to the dataset chosen for analysis. The correlation coefficient between alcohol content and quality is 0.48.
-
-
-```{r echo=FALSE, message=FALSE, warning=FALSE }
-ggplot(data = wine, aes(x = quality, y = fixed.acidity))+
-  geom_boxplot(color = "darkblue")
-
-```
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(data = wine, aes(x = quality, y = fixed.acidity)) +
-  geom_boxplot(color = "darkblue")+
-  coord_cartesian(ylim = c(7,11))
-```
-
-
 The fixed acidity levels tend to increase with quality levels, except for a fall at level 8. However given the slow pace of increase from levels 3 to 6 and the sudden spike at level 7, it is not evident whether the values for level 7 are unusually high or not. The correlation coefficient is 0.12.
 
-
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(data = wine, aes(x = quality, y = volatile.acidity)) +
+```{r fig.height = 8}
+x1 <- ggplot(data = wine, aes(x = quality, y = fixed.acidity))+
   geom_boxplot(color = "darkblue")
+
+x2 <- ggplot(data = wine, aes(x = quality, y = fixed.acidity)) +
+  geom_boxplot(color = "darkblue")+
+  coord_cartesian(ylim = c(7,11))
+
+grid.arrange(x1, x2, ncol = 1)
 ```
 
-The median volatile acidity values falls with the increase in wine qulity.Therefore the volatile acidity levels can be used as a factor to predict wine quality. The correlation coefficient is -0.39.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r}
 wine%>%
   group_by(quality)%>%
   summarise(mean_fixed.acidity = mean(fixed.acidity),
             median_fixed.acidity = median(fixed.acidity))
 ```
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+The median volatile acidity values falls with the increase in wine qulity.Therefore the volatile acidity levels can be used as a factor to predict wine quality. The correlation coefficient is -0.39.
+
+```{r}
+ggplot(data = wine, aes(x = quality, y = volatile.acidity)) +
+  geom_boxplot(color = "darkblue")
+
 wine%>%
   group_by(quality)%>%
   summarise(mean_volatile.acidity = mean(volatile.acidity),
             median_volatile.acidity = median(volatile.acidity))
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(data = wine, aes(x = quality, y=citric.acid)) +
-  geom_boxplot(color = "darkblue")
-```
-
 The median and mean values for citric acid increases with increase in wine quality. Therefore the citric acid value can be a feature of interest in predicting wine quality. The correlation with wine quality is 0.23.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r}
+ggplot(data = wine, aes(x = quality, y=citric.acid)) +
+  geom_boxplot(color = "darkblue")
+
 wine%>%
   group_by(quality)%>%
   summarise(mean_citric.acid = mean(citric.acid),
             median_citric.acid = median(citric.acid))
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(data = wine, aes(x = quality, y= residual.sugar)) +
+The change in median residual sugar values across quality levels is very small and shows an increasing trend except for level 8. Also there are a lot of outliers in this plot. Therefore I do not feel residual sugar is a strong driver of quality of wine. The correlation coefficient is close to zero.
+
+```{r fig.height = 8}
+x1 <- ggplot(data = wine, aes(x = quality, y= residual.sugar)) +
   geom_boxplot(color = "darkblue")
+
+x2 <- ggplot(data = wine, aes(x = quality, y = residual.sugar)) +
+  geom_boxplot(color = "darkblue") +
+  coord_cartesian(ylim = c(1.5,3.5))
+
+grid.arrange(x1, x2, ncol = 1)
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r}
 wine%>%
   group_by(quality)%>%
   summarise(mean_residual.sugar = mean(residual.sugar),
             median_residual.sugar = median(residual.sugar))
 ```
-The change in median residual sugar values across quality levels is very small and shows an increasing trend except for level 8. Also there are a lot of outliers in this plot. Therefore I do not feel residual sugar is a strong driver of quality of wine. The correlation coefficient is close to zero.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(data = wine, aes(x = quality, y = residual.sugar)) +
-  geom_boxplot(color = "darkblue") +
-  coord_cartesian(ylim = c(1.5,3.5))
-```
+The change in median chloride values are very small and shows a general decreasing trend (except for quality level 4). The correlation coefficient is -0.13.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(data = wine, aes(x = quality, y = chlorides)) +
+```{r}
+x1 <- ggplot(data = wine, aes(x = quality, y = chlorides)) +
   geom_boxplot(color = "darkblue")
-```
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(data = wine, aes(x = quality, y = chlorides)) +
+
+x2 <- ggplot(data = wine, aes(x = quality, y = chlorides)) +
   geom_boxplot(color = "darkblue") +
   coord_cartesian(ylim = c(0.05,0.15))
+
+grid.arrange(x1, x2, ncol = 1)
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r}
 wine%>%
   group_by(quality)%>%
   summarise(mean_chlorides = mean(chlorides),
             median_chlorides = median(chlorides))
 ```
 
-The change in median chloride values are very small and shows a general decreasing trend (except for quality level 4). The correlation coefficient is -0.13.
+Both free sulfur dioxide and total sulfur dioxide shows an initial increase with quality and then a decrease with quality. The switch happens at quality level 5, same level at which we see the abberation in trend in alcohol levels. So this raises the question if the S02 levels are impacted by the alcohol content in the wine samples. The correlation of free sulfur dioxide with quality is close to zero. The correlation between total sulfur dioxide and quality is -0.19.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-
-ggplot(data = wine, aes(x = quality, y = free.sulfur.dioxide)) +
+```{r}
+x1 <- ggplot(data = wine, aes(x = quality, y = free.sulfur.dioxide)) +
   geom_boxplot(color = "darkblue")
-```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-
-ggplot(data = wine, aes(x=quality, y= free.sulfur.dioxide))+
+x2 <- ggplot(data = wine, aes(x=quality, y= free.sulfur.dioxide))+
   geom_boxplot(color = "darkblue")+
   coord_cartesian(ylim = c(0,25))
+
+grid.arrange(x1, x2, ncol = 1)
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(data = wine, aes(x = quality, y = total.sulfur.dioxide))+
-  geom_boxplot(color = "darkblue")
-```
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(data = wine, aes(x = quality, y = total.sulfur.dioxide)) +
-  geom_boxplot(color = "darkblue") +
-  coord_cartesian(ylim = c(15,85))
-```
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r}
 wine%>%
   group_by(quality)%>%
   summarise(mean_free.sulfur.dioxide = mean(free.sulfur.dioxide),
             median_free.sulfur.dioxide = median(free.sulfur.dioxide))
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r}
+x1 <- ggplot(data = wine, aes(x = quality, y = total.sulfur.dioxide))+
+  geom_boxplot(color = "darkblue")
+
+x2 <- ggplot(data = wine, aes(x = quality, y = total.sulfur.dioxide)) +
+  geom_boxplot(color = "darkblue") +
+  coord_cartesian(ylim = c(15,85))
+
+grid.arrange(x1, x2, ncol = 1)
+```
+
+```{r}
 wine%>%
   group_by(quality)%>%
   summarise(mean_total.sulfur.dioxide = mean(total.sulfur.dioxide),
             median_total.sulfur.dioxide = median(total.sulfur.dioxide))
 ```
 
-Both free sulfur dioxide and total sulfur dioxide shows an initial increase with quality and then a decrease with quality. The switch happens at quality level 5, same level at which we see the abberation in trend in alcohol levels. So this raises the question if the S02 levels are impacted by the alcohol content in the wine samples. The correlation of free sulfur dioxide with quality is close to zero. The correlation between total sulfur dioxide and quality is -0.19.
+However the plot of total sulfur dioxide vs. alcohol content does not seem to suggest much of a relationship. The correlation coefficient is -0.21.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r}
 ggplot(data = wine, aes(x = alcohol, y = total.sulfur.dioxide)) +
   geom_point(color = "darkblue")
 ```
 
-However the plot of total sulfur dioxide vs. alcohol content does not seem to suggest much of a relationship. The correlation coefficient is -0.21.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r}
 ggplot(data = wine, aes(x = quality, y = pH)) +
   geom_boxplot(color = "darkblue")
 ```
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r}
 
 ggplot(data = wine, aes(x = quality, y = density)) +
   geom_boxplot(color = "darkblue")
 ```
 
+The pH and density values do show a general decreasing trend. However in both cases, for there is an increase in median and mean values at one of the given quality level. The correlation coefficients are -0.06 and -0.17 respectively.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r}
 wine %>%
   group_by(quality)%>%
   summarise(mean.density = mean(density),
@@ -444,22 +438,22 @@ wine %>%
             median.ph = median(pH))
 ```
 
-The pH and density values do show a general decreasing trend. However in both cases, for there is an increase in median and mean values at one of the given quality level. The correlation coefficients are -0.06 and -0.17 respectively.
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(data = wine, aes(x = quality, y = sulphates)) +
-  geom_boxplot(color = "darkblue")
-```
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(data = wine, aes(x = quality, y = sulphates)) +
-  geom_boxplot(color = "darkblue") +
-  coord_cartesian(ylim = c(0.5,1))
-```
-
 The sulphates value show a general increase in mean and median values with quality levels. Therfore the sulphate level could be a factor influencing wine quality. The correlation between sulphate level and wine quality is 0.25.
 
+```{r}
+x1 <- ggplot(data = wine, aes(x = quality, y = sulphates)) +
+  geom_boxplot(color = "darkblue")
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+x2 <- ggplot(data = wine, aes(x = quality, y = sulphates)) +
+  geom_boxplot(color = "darkblue") +
+  coord_cartesian(ylim = c(0.5,1))
+
+grid.arrange(x1, x2, ncol = 1)
+
+```
+
+
+```{r}
 wine%>%
   group_by(quality)%>%
   summarise(mean_sulphates = mean(sulphates),
@@ -468,66 +462,33 @@ wine%>%
 
 Now we will look at some of the attributes and interrelation between them.
 
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r}
 ggplot(data = wine, aes(x=fixed.acidity, y= citric.acid))+
   geom_point(color = "darkblue")
 
 ```
 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r}
 ggplot(data = wine, aes(x = fixed.acidity, y= density)) +
   geom_point(color = "darkblue")
 ```
 
 The plots show a positive correlation for fixed acidity with density (correlation of 0.67) and citric acid (0.67) values.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r}
 ggplot(data = wine, aes(x = volatile.acidity, y =  citric.acid)) +
   geom_point(color = "darkblue")
 ```
 
 Volatile acidity has a negative relatitonship with citric acid values (-0.55).
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r}
 ggplot(data = wine, aes(x = sulphates, y = total.sulfur.dioxide)) +
   geom_point(color = "darkblue")
 ```
 
 Unlike what I expected, no relationship seem to exist between sulphates and S02 values (0.04). 
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(data = wine, aes(x = density, y = residual.sugar)) +
-  geom_point(color = "darkblue") +
-  scale_y_continuous(limits = c(0,4))
-```
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(data = wine, aes(x = density, y = alcohol)) +
-  geom_point(color = "darkblue")
-```
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(data = wine, aes(x = residual.sugar, y = alcohol)) +
-  geom_point(color = "darkblue")+
-  scale_x_continuous(limits = c(0,4))
-```
-
-Residual sugar has a positive relationship with density (0.36) and alcohol has a negative relationship with density (-0.5). The correlation between residual sugars and alcohol is close to zero (0.04). 
-
-#Bivariate Analysis
-
-###How did the feature of interest vary with other features in the dataset?
-
-The quality rating of wine showed a positive relationship to alcohol content, citric acid and sulphates. Wine quality decreased with increase in volatile acidity (as it can increase vinegary taste in wine).  
-
-###Did you observe any interesting relationships between the other features ?
-There is a positive relationship between fixed acidity and density and citric acid values. The relationship between fixed acidity and pH as expected is negative. There is a negative relationship between volatile acidity and citric acid values. There is a weak positive relationship between volatile acidity and pH which is surprising as increase in acidity should decrease pH. There does not seem to be any particular relationship between sulphate levels and sulfur dioxide levels. This was surprising as sulphates contribute to sulfur dioxide levels. The alcohol levels and residual sugar has a correlation close to zero. 
-
-###What was the strongest relationship you found?
-Alcohol content, citric acid, sulphates and volatile acidity appear to have strong correlation with quality of wine. Citric acid imparts flavor to the wine and appear to enjoy a positive relationship with wine quality while volatile acidity, which if high can impart a vinegar like taste to wine, enjoys a negative relationship with wine quality
-
-
-#Multivariate Plots
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width = 12}
 
@@ -560,13 +521,93 @@ ggplot(wine.quality, aes(qual.factors, ecdf, color = as.character(quality)))+
 
 This plot shows the cumulative count of wines as the Citric acid/volatile acidity ratio moves from 0 to 3. For wines with lower quality rating, more than 50% of wines have a ratio belwo 0.5. As wine rating increases, to reach the same percentile count, we need a higher ratio.
 
-# Multivariate Analysis
+
+
+#Bivariate Analysis
+
 
 ### Did you create any new varable in the analysis?
 A new variable called qual.factors was created as the ratio of citric acid to volatile acidity. This variable was meant to capture the effect of two opposing attributes in one variable. 
 
+###How did the feature of interest vary with other features in the dataset?
+
+The quality rating of wine showed a positive relationship to alcohol content, citric acid and sulphates. Wine quality decreased with increase in volatile acidity (as it can increase vinegary taste in wine).
+
+Citric acid imparts flavor and freshness to wine whereas high volatile acidity imparts undesirable taste to wine. The new variable qual.factors captured these two attributes in a singe variable. Across various wine qualities, higher quality wines have more datapoints with higher qual.factors. 
+
+###Did you observe any interesting relationships between the other features ?
+
+There is a positive relationship between fixed acidity and density and citric acid values. The relationship between fixed acidity and pH as expected is negative. There is a negative relationship between volatile acidity and citric acid values. There is a weak positive relationship between volatile acidity and pH which is surprising as increase in acidity should decrease pH. There does not seem to be any particular relationship between sulphate levels and sulfur dioxide levels. This was surprising as sulphates contribute to sulfur dioxide levels. The alcohol levels and residual sugar has a correlation close to zero. 
+
+###What was the strongest relationship you found?
+Alcohol content, citric acid, sulphates and volatile acidity appear to have strong correlation with quality of wine. Citric acid imparts flavor to the wine and appear to enjoy a positive relationship with wine quality while volatile acidity, which if high can impart a vinegar like taste to wine, enjoys a negative relationship with wine quality
+
+
+#Multivariate Plots
+
+In the plot of total sulfur dioxide vs. sulphates, we introduce a third variable alcohol. To do this analysis, a new variable called alcohol.factor is created that categorizes the alcohol values into four bins. For higher alcohol content, the same sulphate levels tends to correspond to higher total sulfur dioxide levels. The trend lines for three of the bins show an increasing trend, while that for wines with alcohol in range 9-10 show a decreasing trend.
+
+
+```{r}
+
+wine$density.factor <- cut(wine$density, breaks = seq(0.99, 1.06, 0.003))
+wine$alcohol.factor <- cut(wine$alcohol, breaks = c(8,9,10,11,16))
+
+ggplot(data = wine, aes(x=sulphates, y=total.sulfur.dioxide, color = alcohol.factor))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  scale_y_continuous(limits = c(0,200))+
+  scale_x_continuous(limits = c(0,1.5))+
+  scale_color_brewer(type = "seq", palette = 1, direction = 1)+
+  theme_dark()
+
+```
+
+We analyse the relationship between residual sugars, alcohol and density. A new variable - density.factor is introduced that categorizes density variable into equal size bins. 
+
+Giving the large difference between the 75th percentile and maximum values for residual sugars, we are limiting the data to the the lower 95 percentile. For various ranges of density, there is a positive trend in the plot of residual sugar vs. alcohol content. As the alcohol content increases, for the same residual sugars, the density value is higher. 
+
+
+```{r}
+ggplot(data = subset(wine, residual.sugar < quantile(residual.sugar,0.95)), aes(x= residual.sugar, y=alcohol, color = density.factor))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  scale_color_brewer(type = "seq", palette = 1, direction = 1)+
+  theme_dark()
+
+  
+```
+
+```{r}
+
+ggplot(data = subset(wine, residual.sugar < quantile(residual.sugar,0.95)), aes(x=residual.sugar, y=density, color = alcohol.factor))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  scale_color_brewer(type = "seq", palette = 1)+
+  theme_dark()
+
+
+```
+
+Now we analyse the relationship between sulphates, citric acid and volatile acidity (using variable qual.factor) for the different quality of wines. The relationship between sulphates and qual.factor variable is positive within each quality level (except for wines with rating 8)
+
+```{r}
+ggplot(data = wine, aes(x= sulphates, y=qual.factors, color = quality))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  scale_color_brewer(type = "seq", palette = 1, direction = 1)+
+  theme_dark()
+  
+```
+
+# Multivariate Analysis
+
+### Did you create any new varable in the analysis?
+Two new variables alcohol.factor and density.factor were created to convert the continuous variables alcohol and density to respective categorical variables.
+
 ### What were some of the relationships observed during the investigation
-Citric acid imparts flavor and freshness to wine whereas high volatile acidity imparts undesirable taste to wine. The new variable qual.factors captured these two attributes in a singe variable. Across various wine qualities, higher quality wines have more datapoints with higher qual.factors as shown in the graph above. 
+
+Even through no relationship exists between alcohol content and residual sugars for the dataset as a whole, when we incorporate density levels into the analysis, we see a positive relationship. A weak positive relationship appear to exist between total sulfur dioxide and sulphates when we include alcohol content of wines in the analysis. Except for wines with quality rating 8, a positive relationship existis between sulphate levels and qual.factor variable (ratio of citric acid to volatile acidity)
 
 
 
@@ -582,27 +623,8 @@ ggplot(data=wine, aes(x=citric.acid))+
   ggtitle("Distribution of citric acid content in the wine samples")
 ```
 
+
 ### Plot 2
-
-These plots examine the distibution of alcohol content in the wine samples by quality. The boxplot shows a decrease in median value for wines with quality rating of 5. However on closer examination using violin plots, we see that the distribution of alcohol values for the samples with quality 5 is very different and could be part of the reason for fall in value. 
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(data = wine, aes(x = quality, y=alcohol))+
-  geom_boxplot(color = "darkblue")+
-  ylab("Percentage of Alcohol")+
-  xlab("Quality Rating")+
-  ggtitle("Boxplot of alcohol content of wine by quality levels")
-```
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(data = wine, aes(x = quality, y=alcohol))+
-  geom_violin(color = "darkolivegreen", fill = "darkblue")+
-  ylab("Percentage of Alcohol")+
-  xlab("Quality Rating")+
-  ggtitle("Distribution of alcohol content of wine by quality levels")
-```
-
-### Plot 3
 This plot indicates that wines with higher quality rating have on average higher citric acid to volatile acidity ratio. This ratio is used to bring together the changes in citric acid and volatile acidity which has opposing effects on wine quality. 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
@@ -617,13 +639,33 @@ ggplot(wine.quality, aes(qual.factors, ecdf, color = as.character(quality)))+
   theme_dark()
 ```
 
+### Plot 3
+
+When we looka t alcohol content and residual sugars as a whole, there does not seem to be a relationship. However when we include density also in the analysis, we can see a trend. The plot indicates that for various density ranges, as the alcohol content increases, the residual sugar values tend to increase.
+
+```{r}
+ggplot(data = subset(wine, residual.sugar < quantile(residual.sugar,0.95)), aes(x= alcohol, y=residual.sugar, color = density.factor))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  scale_color_brewer(type = "seq", palette = 1, direction = 1)+
+  theme_dark()+
+  xlab("Percentage of Alcohol")+
+  ylab("Residual Sugar in grams/liter")+
+  ggtitle("Residual Sugar vs. Alcohol ")+
+  labs(color = "Density category")+
+  scale_x_continuous(limits = c(8,14))
+  
+```
+
 # Reflection
 
 The dataset contains 11 attributes and quality rating of 1599 Portugese Vinho Verde Red wines. I was interested in understanding the attributes that influenced the perceived quality of wine. I started out by trying to understand the individual attributes and its distribution. I asked questions, made observations and tried to identify attributes that had a greater impact on wine quality rating. 
 
 There was a clear trend between the volatile acidity, citric acid and sulphates measures and wine quality. I was surprised to see median alcohol content values fall for one category of the medium quality wines. However a deeper look at the overall distribution pattern helped provide a potential explanation for this observation. 
 
-One area where I struggled was in the creation of the multivariate plot. I had a basic idea of what I wanted to present but it took some research to narrow down how I wanted the final plot to look and to understand the code (ecdf function) to generate it.
+One area where I struggled was in the creation of a bivariate plot using ecdf function. I had a basic idea of what I wanted to present but it took some research to narrow down how I wanted the final plot to look and to understand the code (ecdf function) to generate it.
+
+Another area was creation of multivariate plots using three continuous variables. I converted one of the variables into categorical format and was able to create desired plots.
 
 
 The sample set for this analysis included only Portugese Vinho Verde wines. Therefore the observations made in this analysis might not be applicable to other red wine families. If the sample set contained various types of red wines, then any model developed could help rate red wines from any part of the globe.
